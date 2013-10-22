@@ -5,8 +5,6 @@ use Yjv\TypeFactory\TypeResolverInterface;
 
 use Yjv\TypeFactory\TypeRegistryInterface;
 
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-
 interface FactoryBuilderInterface
 {
     public function addExtension(RegistryExtensionInterface $extension);
