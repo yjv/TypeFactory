@@ -1,6 +1,7 @@
 {
 	"name": "yjv/type-factory",
 	"description": "library with classes that allow easy starting of type factories",
+	"license": "MIT",
 	"require": {
 	    
 	    "php": ">=5.3.0",
