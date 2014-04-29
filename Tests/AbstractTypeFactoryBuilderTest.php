@@ -6,7 +6,7 @@ use Yjv\TypeFactory\TypeResolverInterface;
 
 use Yjv\TypeFactory\TypeRegistryInterface;
 
-use Yjv\TypeFactory\AbstractTypeFactory;
+use Yjv\TypeFactory\TypeFactory;
 
 use Yjv\TypeFactory\TypeFactoryInterface;
 

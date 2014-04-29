@@ -1,14 +1,17 @@
 <?php
 namespace Yjv\TypeFactory;
 
-class Builder implements BuilderInterface
+abstract class AbstractBuilder implements BuilderInterface
 {
+    /** @var array  */
     protected $options;
+    /** @var  TypeFactoryInterface */
     protected $factory;
+    /** @var  TypeChainInterface */
     protected $typeChain;
     
-    public function __construct(TypeFactoryInterface $factory, array $options = array()){
-        
+    public function __construct(TypeFactoryInterface $factory, array $options = array())
+    {
         $this->factory = $factory;
         $this->options = $options;
     }
@@ -45,8 +48,8 @@ class Builder implements BuilderInterface
      * (non-PHPdoc)
      * @see \Yjv\TypeFactory\BuilderInterface::setOptions()
      */
-    public function setOptions(array $options) {
-
+    public function setOptions(array $options)
+    {
         $this->options = $options;
         return $this;
     }

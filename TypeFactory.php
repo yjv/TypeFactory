@@ -4,7 +4,7 @@ namespace Yjv\TypeFactory;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-abstract class AbstractTypeFactory implements TypeFactoryInterface
+class TypeFactory implements TypeFactoryInterface
 {
     protected $typeResolver;
 
@@ -13,6 +13,17 @@ abstract class AbstractTypeFactory implements TypeFactoryInterface
         $this->typeResolver = $typeResolver;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function create($type, array $options = array())
+    {
+        return $this->createBuilder($type, $options)->build();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createBuilder($type, array $options = array())
     {
         $typeChain = $this->getTypeChain($type);
@@ -39,8 +50,8 @@ abstract class AbstractTypeFactory implements TypeFactoryInterface
      * @see \Yjv\TypeFactory\TypeFactoryInterface::getBuilderInterfaceName()
      * @codeCoverageIgnore
      */
-    public function getBuilderInterfaceName() {
-
+    public function getBuilderInterfaceName()
+    {
         return 'Yjv\TypeFactory\BuilderInterface';
     }
 

@@ -6,8 +6,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 interface TypeInterface
 {
     /**
-     * 
-     * @param object $builder the object builder
+     *
+     * @param \Yjv\TypeFactory\BuilderInterface $builder the object builder
      * @param array $options
      */
     public function build(BuilderInterface $builder, array $options);

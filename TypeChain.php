@@ -12,6 +12,11 @@ class TypeChain implements \Iterator, TypeChainInterface
 
     public function __construct(array $types)
     {
+        if (empty($types)) {
+
+            throw new \InvalidArgumentException('$types must have at least one type in it.');
+        }
+
         $this->types = $types;
     }
 
@@ -55,100 +60,113 @@ class TypeChain implements \Iterator, TypeChainInterface
     {
         return isset($this->types[$this->index]);
     }
-    
+
+    public function getStartingType()
+    {
+        $this
+            ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_TYPES)
+            ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_CHILD_FIRST)
+        ;
+
+        return $this->current();
+    }
+
     public function getOptionsResolver()
     {
         $this
             ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_CHILD_FIRST)
             ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_TYPE_EXTENSIONS)
         ;
-    
+
         $optionsResolver = null;
-        
+
         foreach ($this as $type) {
-    
+
             if ($optionsResolver = $type->getOptionsResolver()) {
-    
+
                 break;
             }
         }
-    
+
         return $optionsResolver;
     }
-    
+
     public function getOptions(OptionsResolverInterface $optionsResolver, array $options)
     {
         $this
             ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_PARENT_FIRST)
             ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_NONE)
         ;
-    
+
+        /** @var $type TypeInterface */
         foreach ($this as $type) {
-    
+
             $type->setDefaultOptions($optionsResolver);
         }
-    
+
         return $optionsResolver->resolve($options);
     }
-    
+
     public function getBuilder(TypeFactoryInterface $factory, array $options)
     {
         $this
             ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_CHILD_FIRST)
             ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_TYPE_EXTENSIONS)
         ;
-    
+
         $builder = null;
-        
+
+        /** @var $type TypeInterface */
         foreach ($this as $type) {
-    
+
             if ($builder = $type->createBuilder($factory, $options)) {
-    
+
                 break;
             }
         }
-    
+
         if ($builder) {
-            
+
             $builder->setTypeChain($this);
         }
-        
+
         return $builder;
     }
-    
+
     public function build(BuilderInterface $builder, array $options)
     {
         $this
             ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_PARENT_FIRST)
             ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_NONE)
         ;
-    
+
+        /** @var $type TypeInterface */
         foreach ($this as $type) {
-    
+
             $type->build($builder, $options);
         }
-    
+
         return $builder;
     }
-    
+
     public function finalize($object, array $options)
     {
         $this
             ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_PARENT_FIRST)
             ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_TYPE_EXTENSIONS)
         ;
-    
+
         foreach ($this as $type) {
-    
+
             if ($type instanceof FinalizingTypeInterface) {
-    
+
                 $type->finalize($object, $options);
             }
         }
-    
+
         return $object;
     }
-    
+
     protected function validateCurrentForExclusionStrategy()
     {
         if (!$this->valid()) {

@@ -1,7 +1,7 @@
 <?php
 namespace Yjv\TypeFactory\Tests;
 
-use Yjv\TypeFactory\Builder;
+use Yjv\TypeFactory\AbstractBuilder;
 
 use Mockery;
 
@@ -15,7 +15,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory = Mockery::mock('Yjv\TypeFactory\TypeFactoryInterface');
         $this->options = array('key' => 'value');
-        $this->builder = new Builder($this->factory, $this->options);
+        $this->builder = new AbstractBuilder($this->factory, $this->options);
     }
     
     public function testGettersSetters()
