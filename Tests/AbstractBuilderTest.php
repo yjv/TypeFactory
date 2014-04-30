@@ -1,12 +1,13 @@
 <?php
 namespace Yjv\TypeFactory\Tests;
 
-use Yjv\TypeFactory\AbstractBuilder;
-
 use Mockery;
+use Yjv\TypeFactory\AbstractBuilder;
+use Yjv\TypeFactory\Tests\Fixtures\MockBuilder;
 
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class AbstractBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var  AbstractBuilder */
     protected $builder;
     protected $factory;
     protected $options;
@@ -15,7 +16,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory = Mockery::mock('Yjv\TypeFactory\TypeFactoryInterface');
         $this->options = array('key' => 'value');
-        $this->builder = new AbstractBuilder($this->factory, $this->options);
+        $this->builder = new MockBuilder($this->factory, $this->options);
     }
     
     public function testGettersSetters()
@@ -35,3 +36,5 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($typeChain, $this->builder->getTypeChain());
     }
 }
+
+

@@ -12,11 +12,6 @@ class TypeChain implements \Iterator, TypeChainInterface
 
     public function __construct(array $types)
     {
-        if (empty($types)) {
-
-            throw new \InvalidArgumentException('$types must have at least one type in it.');
-        }
-
         $this->types = $types;
     }
 
@@ -64,7 +59,7 @@ class TypeChain implements \Iterator, TypeChainInterface
     public function getStartingType()
     {
         $this
-            ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_TYPES)
+            ->setExclusionStrategy(TypeChainInterface::EXCLUSION_STRATEGY_TYPE_EXTENSIONS)
             ->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_CHILD_FIRST)
         ;
 

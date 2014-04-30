@@ -11,14 +11,21 @@ use Yjv\TypeFactory\TypeRegistry;
 
 class TypeChainTest extends \PHPUnit_Framework_TestCase{
 
-	protected $chain;
+	/** @var  TypeChain */
+    protected $chain;
+    /** @var  Mockery\MockInterface */
 	protected $type1;
+    /** @var  Mockery\MockInterface */
 	protected $type2;
+    /** @var  Mockery\MockInterface */
 	protected $type2Extension;
+    /** @var  Mockery\MockInterface */
 	protected $type3;
-	
-	/**
-	 * 
+    /** @var  Mockery\MockInterface[] */
+    protected $types;
+
+    /**
+	 *
 	 */
 	protected function setUp() {
 
@@ -34,8 +41,13 @@ class TypeChainTest extends \PHPUnit_Framework_TestCase{
         );
 	    $this->chain = new TypeChain($this->types);
 	}
-	
-	public function testIteration() {
+
+    public function testGetStartingType()
+    {
+        $this->assertSame($this->type3, $this->chain->getStartingType());
+    }
+
+    public function testIteration() {
 		
 		$this->assertSame($this->types, iterator_to_array($this->chain));
 		$this->chain->setIterationDirection(TypeChainInterface::ITERATION_DIRECTION_CHILD_FIRST);

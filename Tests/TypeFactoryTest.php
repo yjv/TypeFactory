@@ -18,19 +18,24 @@ use Mockery;
 
 class TypeFactoryTest extends \PHPUnit_Framework_TestCase
 {
-
+    /** @var  TypeFactory */
     protected $factory;
-    protected $finalizingFactory;
+    /** @var Mockery\MockInterface */
     protected $resolver;
+    /** @var Mockery\MockInterface */
     protected $builder;
+    /** @var Mockery\MockInterface */
     protected $typeChain;
+    /** @var Mockery\MockInterface */
+    protected $optionsResolver;
 
     protected function setUp()
     {
+        $this->optionsResolver = Mockery::mock('Symfony\Component\OptionsResolver\OptionsResolver');
         $this->typeChain = Mockery::mock('Yjv\TypeFactory\TypeChainInterface')
             ->shouldReceive('getOptionsResolver')
             ->byDefault()
-            ->andReturn(Mockery::mock('Symfony\Component\OptionsResolver\OptionsResolver'))
+            ->andReturn($this->optionsResolver)
             ->getMock()
             ->shouldReceive('getOptions')
             ->byDefault()
@@ -53,52 +58,30 @@ class TypeFactoryTest extends \PHPUnit_Framework_TestCase
             ->andReturn($this->typeChain)
             ->getMock()
         ;
-        $this->factory = new TestTypeFactory($this->resolver, 'Yjv\TypeFactory\BuilderInterface');
-        $this->finalizingFactory = new TestTypeFactory(
-            $this->resolver, 
-            'Yjv\TypeFactory\BuilderInterface',
-            true
-        );
+        $this->factory = new TypeFactory($this->resolver);
         $this->builder = Mockery::mock('Yjv\TypeFactory\BuilderInterface');
     }
 
-    /**
-     */
-    public function testCreateBuilder()
+    public function testCreate()
     {
-        $passedOptions = array('option1' => '1');
-        $returnedOptions = array('option1' => '1', 'option2' => '2');
-        $optionsResolver = Mockery::mock('Symfony\Component\OptionsResolver\OptionsResolver');
-        $this->typeChain
-            ->shouldReceive('getOptionsResolver')
-            ->once()
-            ->ordered()
-            ->andReturn($optionsResolver)
-            ->getMock()
-            ->shouldReceive('getOptions')
-            ->with($optionsResolver, $passedOptions)
-            ->once()
-            ->ordered()
-            ->andReturn($returnedOptions)
-            ->getMock()
-            ->shouldReceive('getBuilder')
-            ->once()
-            ->with($this->factory, $returnedOptions)
-            ->ordered()
-            ->andReturn($this->builder)
-            ->getMock()
+        $object = new \stdClass();
+        $this->setupSuccessfulCreateBuilderExpectations($passedOptions = array('option1' => '1'));
+
+        $this->builder
             ->shouldReceive('build')
-            ->with($this->builder, $returnedOptions)
-            ->ordered()
             ->once()
-            ->getMock()
+            ->andReturn($object)
         ;
 
-        $this->resolver
-            ->shouldReceive('resolveTypeChain')
-            ->with('name1')
-            ->andReturn($this->typeChain)
-        ;
+        $this->assertSame(
+            $object,
+            $this->factory->create('name1', $passedOptions)
+        );
+    }
+
+    public function testCreateBuilder()
+    {
+        $this->setupSuccessfulCreateBuilderExpectations($passedOptions = array('option1' => '1'));
 
         $this->assertSame(
             $this->builder,
@@ -107,7 +90,7 @@ class TypeFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Yjv\TypeFactory\BuilderNotSupportedException
+     * @expectedException \Yjv\TypeFactory\BuilderNotSupportedException
      */
     public function testCreateBuilderWithBadBuilderClass()
     {
@@ -120,7 +103,7 @@ class TypeFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Yjv\TypeFactory\BuilderNotReturnedException
+     * @expectedException \Yjv\TypeFactory\BuilderNotReturnedException
      */
     public function testCreateBuilderWithBuilderNotReturned()
     {
@@ -133,7 +116,7 @@ class TypeFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Yjv\TypeFactory\OptionsResolverNotReturnedException
+     * @expectedException \Yjv\TypeFactory\OptionsResolverNotReturnedException
      */
     public function testCreateBuilderWithOptionsResolverNotReturned()
     {
@@ -171,32 +154,39 @@ class TypeFactoryTest extends \PHPUnit_Framework_TestCase
             $this->factory->getBuilderInterfaceName()
         );
     }
-}
 
-class TestTypeFactory extends TypeFactory
-{
-    protected $builderClass;
-    
-    public function __construct(TypeResolverInterface $resolver, $builderClass = null, $supportsFinalizing = false)
+    protected function setupSuccessfulCreateBuilderExpectations(array $passedOptions)
     {
-        $this->builderClass = $builderClass;
-        parent::__construct($resolver, $supportsFinalizing);
-    }
-    
-    /**
-    * @return string
-    */
-    public function getBuilderInterfaceName() {
+        $returnedOptions = array('option1' => '1', 'option2' => '2');
+        $this->typeChain
+            ->shouldReceive('getOptionsResolver')
+            ->once()
+            ->ordered()
+            ->andReturn($this->optionsResolver)
+            ->getMock()
+            ->shouldReceive('getOptions')
+            ->with($this->optionsResolver, $passedOptions)
+            ->once()
+            ->ordered()
+            ->andReturn($returnedOptions)
+            ->getMock()
+            ->shouldReceive('getBuilder')
+            ->once()
+            ->with($this->factory, $returnedOptions)
+            ->ordered()
+            ->andReturn($this->builder)
+            ->getMock()
+            ->shouldReceive('build')
+            ->with($this->builder, $returnedOptions)
+            ->ordered()
+            ->once()
+            ->getMock()
+        ;
 
-        if (!is_string($this->builderClass)) {
-            
-            return parent::getBuilderInterfaceName();
-        }
-        
-        return $this->builderClass;
-    }
-
-    public function create($type, array $options = array())
-    {
+        $this->resolver
+            ->shouldReceive('resolveTypeChain')
+            ->with('name1')
+            ->andReturn($this->typeChain)
+        ;
     }
 }

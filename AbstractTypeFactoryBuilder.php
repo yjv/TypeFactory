@@ -86,7 +86,7 @@ abstract class AbstractTypeFactoryBuilder implements FactoryBuilderInterface
     }
     
     /**
-     * @return Yjv\TypeFactory\TypeFactoryInterface
+     * @return \Yjv\TypeFactory\TypeFactoryInterface
      */
     abstract protected function getFactoryInstance();
 }
