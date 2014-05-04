@@ -10,6 +10,7 @@ use Yjv\TypeFactory\TypeRegistry;
 class TypeTestCase extends \PHPUnit_Framework_TestCase
 {
 	protected $builder;
+    protected $mockedBuilder;
 	protected $factory;
 	protected $resolver;
 	protected $registry;
