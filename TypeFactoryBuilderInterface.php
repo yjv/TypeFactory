@@ -5,9 +5,12 @@ use Yjv\TypeFactory\TypeResolverInterface;
 
 use Yjv\TypeFactory\TypeRegistryInterface;
 
-interface FactoryBuilderInterface
+interface TypeFactoryBuilderInterface
 {
+    public function setExtensions(array $extension);
     public function addExtension(RegistryExtensionInterface $extension);
+    public function getExtensions();
+    public function addDefaultExtensions();
     public function setTypeRegistry(TypeRegistryInterface $typeRegistry);
     public function getTypeRegistry();
     public function setTypeResolver(TypeResolverInterface $typeResolver);
