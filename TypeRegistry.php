@@ -1,8 +1,6 @@
 <?php
 namespace Yjv\TypeFactory;
 
-use Yjv\TypeFactory\RegistryExtensionInterface;
-
 class TypeRegistry implements TypeRegistryInterface
 {
     protected $types = array();

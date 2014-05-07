@@ -7,10 +7,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class TypeFactory implements TypeFactoryInterface
 {
     protected $typeResolver;
+    protected $builderInterfaceName;
 
-    public function __construct(TypeResolverInterface $typeResolver)
-    {
+    public function __construct(
+        TypeResolverInterface $typeResolver,
+        $builderInterfaceName = TypeFactoryInterface::DEFAULT_BUILDER_INTERFACE_NAME
+    ) {
         $this->typeResolver = $typeResolver;
+        $this->builderInterfaceName = $builderInterfaceName;
     }
 
     /**
@@ -52,7 +56,7 @@ class TypeFactory implements TypeFactoryInterface
      */
     public function getBuilderInterfaceName()
     {
-        return 'Yjv\TypeFactory\BuilderInterface';
+        return $this->builderInterfaceName;
     }
 
     protected function getOptionsResolver(TypeChainInterface $typeChain)

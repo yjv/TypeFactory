@@ -1,12 +1,13 @@
 <?php
 namespace Yjv\TypeFactory;
 
-abstract class AbstractTypeFactoryBuilder implements TypeFactoryBuilderInterface
+class TypeFactoryBuilder implements TypeFactoryBuilderInterface
 {
     protected $extensions = array();
     protected $typeRegistry;
     protected $typeResolver;
     protected $typeName;
+    protected $builderInterfaceName;
     protected $extensionsSet = false;
 
     public static function create()
@@ -91,28 +92,49 @@ abstract class AbstractTypeFactoryBuilder implements TypeFactoryBuilderInterface
     {
         return $this->typeName;
     }
-    
+
+    public function setBuilderInterfaceName($builderInterfaceName)
+    {
+        $this->builderInterfaceName = $builderInterfaceName;
+        return $this;
+    }
+
+    public function getBuilderInterfaceName()
+    {
+        if (!$this->builderInterfaceName) {
+
+            $this->builderInterfaceName = $this->getDefaultBuilderInterfaceName();
+        }
+
+        return $this->builderInterfaceName;
+    }
+
     public function build()
     {
         $factory = $this->getFactoryInstance();
         $typeRegistry = $factory->getTypeRegistry();
-        
+
         foreach ($this->getExtensions() as $extension) {
-            
+
             $typeRegistry->addExtension($extension);
         }
-        
+
         return $factory;
     }
-    
+
     protected function getDefaultTypeRegistry()
     {
         return new TypeRegistry($this->getTypeName());
     }
-    
+
     protected function getDefaultTypeResolver()
     {
         return new TypeResolver($this->getTypeRegistry());
+    }
+
+    protected function getDefaultBuilderInterfaceName()
+    {
+        return TypeFactoryInterface::DEFAULT_BUILDER_INTERFACE_NAME;
     }
 
     /**
@@ -127,5 +149,11 @@ abstract class AbstractTypeFactoryBuilder implements TypeFactoryBuilderInterface
     /**
      * @return \Yjv\TypeFactory\TypeFactoryInterface
      */
-    abstract protected function getFactoryInstance();
+    protected function getFactoryInstance()
+    {
+        return new TypeFactory(
+            $this->getTypeResolver(),
+            $this->getBuilderInterfaceName()
+        );
+    }
 }

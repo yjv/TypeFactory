@@ -3,6 +3,8 @@ namespace Yjv\TypeFactory;
 
 interface TypeFactoryInterface
 {
+    const DEFAULT_BUILDER_INTERFACE_NAME = 'Yjv\TypeFactory\BuilderInterface';
+
     /**
      *
      * @param string|TypeInterface $type

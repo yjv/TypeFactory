@@ -17,5 +17,7 @@ interface TypeFactoryBuilderInterface
     public function getTypeResolver();
     public function setTypeName($typeName);
     public function getTypeName();
+    public function setBuilderInterfaceName($builderInterfaceName);
+    public function getBuilderInterfaceName();
     public function build();
 }

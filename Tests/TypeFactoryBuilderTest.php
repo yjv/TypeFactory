@@ -1,8 +1,10 @@
 <?php
 namespace Yjv\TypeFactory\Tests;
-use Yjv\TypeFactory\AbstractTypeFactoryBuilder;
+use Faker\Factory;
+use Yjv\TypeFactory\TypeFactoryBuilder;
 
 use Yjv\TypeFactory\Tests\Fixtures\MockTypeFactoryBuilder;
+use Yjv\TypeFactory\TypeResolver;
 use Yjv\TypeFactory\TypeResolverInterface;
 
 use Yjv\TypeFactory\TypeRegistryInterface;
@@ -19,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Mockery;
 
-class AbstractTypeFactoryBuilderTest extends \PHPUnit_Framework_TestCase
+class TypeFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var MockTypeFactoryBuilder  */
     protected $builder;
@@ -33,57 +35,42 @@ class AbstractTypeFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $this->factory = Mockery::mock('Yjv\TypeFactory\TypeFactoryInterface');
         $this->extension1 = Mockery::mock('Yjv\TypeFactory\RegistryExtensionInterface');
         $this->extension2 = Mockery::mock('Yjv\TypeFactory\RegistryExtensionInterface');
-        $this->builder = new MockTypeFactoryBuilder($this->factory, array($this->extension1, $this->extension2));
+        $this->builder = new TypeFactoryBuilder();
     }
     
     public function testBuild()
     {
-        $extension1 = Mockery::mock('Yjv\TypeFactory\RegistryExtensionInterface');
-        $extension2 = Mockery::mock('Yjv\TypeFactory\RegistryExtensionInterface');
-        $registry = Mockery::mock('Yjv\TypeFactory\TypeRegistryInterface')
-            ->shouldReceive('addExtension')
-            ->once()
-            ->with($extension1)
-            ->getMock()
-            ->shouldReceive('addExtension')
-            ->once()
-            ->with($extension2)
-            ->getMock()
+        $registry = new TypeRegistry();
+        $factory = new TypeFactory(new TypeResolver($registry));
+        $registry
+            ->addExtension($this->extension1)
+            ->addExtension($this->extension2)
         ;
-        $this->factory
-            ->shouldReceive('getTypeRegistry')
-            ->once()
-            ->andReturn($registry)
-            ->getMock()
-        ;
-        $this->builder->addExtension($extension1);
-        $this->builder->addExtension($extension2);
-        $this->assertSame($this->factory, $this->builder->build());
+        $this->builder->addExtension($this->extension1);
+        $this->builder->addExtension($this->extension2);
+        $this->assertEquals($factory, $this->builder->build());
     }
 
     public function testBuildWithoutSettingExtensions()
     {
-        $registry = Mockery::mock('Yjv\TypeFactory\TypeRegistryInterface')
-            ->shouldReceive('addExtension')
-            ->once()
-            ->with($this->extension1)
-            ->getMock()
-            ->shouldReceive('addExtension')
-            ->once()
-            ->with($this->extension2)
-            ->getMock()
+        $this->builder = new MockTypeFactoryBuilder(array($this->extension1, $this->extension2));
+        $registry = new TypeRegistry();
+        $factory = new TypeFactory(new TypeResolver($registry));
+        $registry
+            ->addExtension($this->extension1)
+            ->addExtension($this->extension2)
         ;
-        $this->factory
-            ->shouldReceive('getTypeRegistry')
-            ->once()
-            ->andReturn($registry)
-            ->getMock()
-        ;
-        $this->assertSame($this->factory, $this->builder->build());
+        $this->assertEquals($factory, $this->builder->build());
     }
 
     public function testGettersSetters()
     {
+        $this->assertEquals(TypeFactoryInterface::DEFAULT_BUILDER_INTERFACE_NAME, $this->builder->getBuilderInterfaceName());
+        $builderInterfaceName = Factory::create()->word;
+        $this->assertSame($this->builder, $this->builder->setBuilderInterfaceName($builderInterfaceName));
+        $this->assertEquals($builderInterfaceName, $this->builder->getBuilderInterfaceName());
+        $this->assertSame(array(), $this->builder->getExtensions());
+        $this->builder = new MockTypeFactoryBuilder(array($this->extension1, $this->extension2));
         $this->assertSame(array($this->extension1, $this->extension2), $this->builder->getExtensions());
         $extension3 = Mockery::mock('Yjv\TypeFactory\RegistryExtensionInterface');
         $this->assertSame($this->builder, $this->builder->addExtension($extension3));

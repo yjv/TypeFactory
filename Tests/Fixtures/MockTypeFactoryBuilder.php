@@ -9,26 +9,17 @@
 namespace Yjv\TypeFactory\Tests\Fixtures;
 
 
-use Yjv\TypeFactory\AbstractTypeFactoryBuilder;
+use Yjv\TypeFactory\TypeFactoryBuilder;
 use Yjv\TypeFactory\TypeFactoryInterface;
 
-class MockTypeFactoryBuilder extends AbstractTypeFactoryBuilder
+class MockTypeFactoryBuilder extends TypeFactoryBuilder
 {
     protected $factory;
     protected $defaultExtensions;
 
-    public function __construct(TypeFactoryInterface $factory = null, array $defaultExtensions = array())
+    public function __construct(array $defaultExtensions = array())
     {
-        $this->factory = $factory;
         $this->defaultExtensions = $defaultExtensions;
-    }
-
-    /**
-     * @return \Yjv\TypeFactory\TypeFactoryInterface
-     */
-    protected function getFactoryInstance()
-    {
-        return $this->factory;
     }
 
     protected function getDefaultExtensions()
